@@ -1,9 +1,17 @@
 import express from 'express';
 import {productsRouter} from './routes/productsRouter.js';
 import {cartRouter} from './routes/cartRouter.js';
-const PORT = 8080;
+
+import handlebars from 'express-handlebars'
+import __dirname from './utils.js'
 
 const app = express();
+const PORT = 8080;
+
+app.engine('handlebars', handlebars.engine());
+app.set('views', __dirname+'/views');
+app.set('view engine', 'handlebars')
+app.use(express.static(__dirname+'public'))
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -11,8 +19,11 @@ app.use("/api/products", productsRouter)
 app.use("/api/cart", cartRouter)
 
 app.get("/" ,(req,res) => {
-    res.setHeader('Content-Type', 'text/plain');
-    res.status(200).send('OK');
+    let testUser = {
+        name : "Bruno",
+        last_name : "Miceli"
+    }
+    res.render('index', testUser)
 })
 
 const server = app.listen(PORT, () => {
