@@ -1,0 +1,48 @@
+<h1>Lista de Productos en Tiempo Real</h1>
+<ul id="product-list">
+    {{#each products}}
+        <li>{{this.name}} - {{this.price}}</li>
+    {{/each}}
+</ul>
+
+<form id="product-form">
+    <input type="text" id="productName" placeholder="Nombre del producto" required>
+    <input type="number" id="productPrice" placeholder="Precio" required>
+    <button type="submit">Agregar Producto</button>
+</form>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    // Manejar el envío del formulario y emitir el evento 'new-product'
+    document.getElementById('product-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const name = document.getElementById('productName').value;
+        const price = parseFloat(document.getElementById('productPrice').value);
+        
+        if (!name || isNaN(price) || price <= 0) {
+            alert("Por favor ingrese un nombre válido y un precio mayor a 0.");
+            return;
+        }
+
+        // Emitir el producto nuevo al servidor
+        socket.emit('new-product', { name, price });
+
+        // Limpiar el formulario después del envío
+        document.getElementById('productName').value = '';
+        document.getElementById('productPrice').value = '';
+    });
+
+    // Escuchar el evento 'update-products' para actualizar la lista de productos
+    socket.on('update-products', (products) => {
+        const productList = document.getElementById('product-list');
+        productList.innerHTML = ''; // Limpiar la lista existente
+
+        // Añadir cada producto recibido del servidor a la lista
+        products.forEach(product => {
+            productList.innerHTML += `<li>${product.name} - $${product.price.toFixed(2)}</li>`;
+        });
+    });
+</script>
