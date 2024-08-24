@@ -12,7 +12,7 @@ productsRouter.get("/", async (req, res) => {
     productos = productos.slice(0, limite);
   }
   res.setHeader("Content-Type", "application/json");
-  return res.status(200).json({ payload: productos });
+  return res.status(200).send(productos)
 });
 
 productsRouter.get("/:pid", async (req, res) => {

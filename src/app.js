@@ -32,6 +32,12 @@ app.get("/", (req, res) => {
   };
   res.render("index", testUser);
 });
+app.get("/home", async(req, res) => {
+    let productos = await ProductsManager.getProducts("./src/data/products.json");
+    res.render("home",{
+        productos
+    });
+})
 app.get("/realtimeproducts", (req, res) => {
   res.render("realTimeProducts");
 });
