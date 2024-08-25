@@ -10,17 +10,5 @@
     "thumbnail": "barral.png",
     "status": true,
     "id": 1
-  },
-  {
-    "name": "Andador",
-    "price": 20,
-    "description": "Andador ortopédico ",
-    "title": "Andador ortopedico",
-    "code": "0200",
-    "stock": 30,
-    "category": "Andadores",
-    "thumbnail": "❤️",
-    "status": true,
-    "id": 2
   }
 ]

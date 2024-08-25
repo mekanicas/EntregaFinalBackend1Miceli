@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
   };
   res.render("index", testUser);
 });
-app.get("/home", async(req, res) => { // ESTO ESTA HARDCODEADO
+app.get("/home", async(req, res) => {
     let productos = await ProductsManager.getProducts("./src/data/products.json");
     res.render("home",{
         productos
@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
        const result = await productManager.addProducto(product);
        console.log(result); // Debugging log
 
-       // Emit the updated list of products
+       // Emit la lista de productos actualizada
        const updatedProducts = await ProductsManager.getProducts(
          "path_to_your/products.json"
        );
@@ -71,11 +71,11 @@ io.on("connection", (socket) => {
         const result = await productManager.deleteProduct(productId);
         console.log("Resultado de eliminación:", result);
 
-        // Emit an event to update the product list after deletion
+        // Emitir la lista de productos actualizada a todos los clientes conectados
         const updatedProducts = await ProductsManager.getProducts(
           "path_to_your/products.json"
         );
-        socket.emit("update-products", updatedProducts);
+        io.emit("update-products", updatedProducts);
       } catch (error) {
         console.error("Error eliminando producto:", error);
       }
