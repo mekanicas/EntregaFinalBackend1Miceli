@@ -12,6 +12,8 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server);
 const PORT = 8080;
+const productManager = new ProductsManager("./src/data/products.json");
+await productManager.init();
 
 // Configuración del motor de plantillas Handlebars
 app.engine("handlebars", handlebars.engine());
@@ -32,7 +34,7 @@ app.get("/", (req, res) => {
   };
   res.render("index", testUser);
 });
-app.get("/home", async(req, res) => {
+app.get("/home", async(req, res) => { // ESTO ESTA HARDCODEADO
     let productos = await ProductsManager.getProducts("./src/data/products.json");
     res.render("home",{
         productos
@@ -47,13 +49,37 @@ let products = []; // Array para los products
 io.on("connection", (socket) => {
   console.log("Usuario conectado");
 
-  socket.on("new-product", async (product) => {
-    await ProductsManager.addProducto(product);
-    const updatedProducts = await ProductsManager.getProducts(
-      "./src/data/products.json"
-    );
-    io.emit("update-products", updatedProducts);
-  });
+   socket.on("new-product", async (product) => {
+     try {
+       const result = await productManager.addProducto(product);
+       console.log(result); // Debugging log
+
+       // Emit the updated list of products
+       const updatedProducts = await ProductsManager.getProducts(
+         "path_to_your/products.json"
+       );
+       io.emit("update-products", updatedProducts);
+     } catch (error) {
+       console.error("Error adding product:", error);
+     }
+   });
+
+    socket.on("delete-product", async (productId) => {
+      console.log("ID recibido para eliminar:", productId);
+
+      try {
+        const result = await productManager.deleteProduct(productId);
+        console.log("Resultado de eliminación:", result);
+
+        // Emit an event to update the product list after deletion
+        const updatedProducts = await ProductsManager.getProducts(
+          "path_to_your/products.json"
+        );
+        socket.emit("update-products", updatedProducts);
+      } catch (error) {
+        console.error("Error eliminando producto:", error);
+      }
+    });
 
   socket.on("disconnect", () => {
     console.log("Usuario desconectado");

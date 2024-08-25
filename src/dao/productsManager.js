@@ -17,6 +17,7 @@ export class ProductsManager {
   }
 
   async addProducto(product) {
+    await this.init();
     console.log(product);
     const requiredFields = [
       "title",
@@ -36,7 +37,7 @@ export class ProductsManager {
     if (existe != -1) {
       this.products[existe].stock += product.stock;
       await this.saveProducts();
-      return `Producto agregado al stock existente, stock : ${this.products[existe].stock}`;
+      return `Producto agregado al stock existente, stock: ${this.products[existe].stock}`;
     }
     let id = 1;
     if (this.products.length > 0) {

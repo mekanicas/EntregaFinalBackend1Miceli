@@ -1,14 +1,27 @@
 <h1>Lista de Productos en Tiempo Real</h1>
 <ul id="product-list">
-    {{#each products}}
-        <li>{{this.name}} - {{this.price}}</li>
+    {{#each productos}}
+        <li>{{this.name}} - ${{this.price}} - ID:{{this.id}}</li>
     {{/each}}
 </ul>
 
+<!-- Formulario para agregar productos -->
 <form id="product-form">
     <input type="text" id="productName" placeholder="Nombre del producto" required>
     <input type="number" id="productPrice" placeholder="Precio" required>
+    <input type="text" id="productDescription" placeholder="Descripción" required>
+    <input type="text" id="productTitle" placeholder="Título" required>
+    <input type="text" id="productCode" placeholder="Código" required>
+    <input type="number" id="productStock" placeholder="Stock" required>
+    <input type="text" id="productCategory" placeholder="Categoría" required>
+    <input type="text" id="productThumbnail" placeholder="Thumbnail" required>
     <button type="submit">Agregar Producto</button>
+</form>
+
+<!-- Formulario para eliminar productos -->
+<form id="delete-form">
+    <input type="number" id="productIdToDelete" placeholder="ID del producto" required>
+    <button type="submit">Eliminar Producto</button>
 </form>
 
 <script src="/socket.io/socket.io.js"></script>
@@ -21,28 +34,67 @@
         
         const name = document.getElementById('productName').value;
         const price = parseFloat(document.getElementById('productPrice').value);
-        
-        if (!name || isNaN(price) || price <= 0) {
-            alert("Por favor ingrese un nombre válido y un precio mayor a 0.");
+        const description = document.getElementById('productDescription').value;
+        const title = document.getElementById('productTitle').value;
+        const code = document.getElementById('productCode').value;
+        const stock = parseInt(document.getElementById('productStock').value);
+        const category = document.getElementById('productCategory').value;
+        const thumbnail = document.getElementById('productThumbnail').value;
+
+        if (!name || isNaN(price) || price <= 0 || isNaN(stock) || stock <= 0) {
+            alert("Por favor ingrese todos los datos correctamente.");
             return;
         }
 
+        const newProduct = {
+            name,
+            price,
+            description,
+            title,
+            code,
+            stock,
+            category,
+            thumbnail,
+            status: true  // Asumimos que los nuevos productos están activos por defecto
+        };
+
+        console.log("Emitiendo nuevo producto:", newProduct);
+
         // Emitir el producto nuevo al servidor
-        socket.emit('new-product', { name, price });
+        socket.emit('new-product', newProduct);
 
         // Limpiar el formulario después del envío
-        document.getElementById('productName').value = '';
-        document.getElementById('productPrice').value = '';
+        document.getElementById('product-form').reset();
+    });
+
+    // Manejar el envío del formulario y emitir el evento 'delete-product'
+    document.getElementById('delete-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        
+        const productId = parseInt(document.getElementById('productIdToDelete').value);
+        
+        if (isNaN(productId) || productId <= 0) {
+            alert("Por favor ingrese un ID válido.");
+            return;
+        }
+
+        console.log("Emitiendo ID del producto a eliminar :", productId)
+
+        // Emitir el ID del producto a eliminar al servidor
+        socket.emit('delete-product', productId);
+
+        // Limpiar el formulario después del envío
+        document.getElementById('productIdToDelete').value = '';
     });
 
     // Escuchar el evento 'update-products' para actualizar la lista de productos
-    socket.on('update-products', (products) => {
+    socket.on('update-products', (productos) => {
         const productList = document.getElementById('product-list');
         productList.innerHTML = ''; // Limpiar la lista existente
 
         // Añadir cada producto recibido del servidor a la lista
-        products.forEach(product => {
-            productList.innerHTML += `<li>${product.name} - $${product.price.toFixed(2)}</li>`;
+        productos.forEach(product => {
+            productList.innerHTML += `<li>${product.name} - $${product.price.toFixed(2)} - ID:${product.id}</li>`;
         });
     });
 </script>
