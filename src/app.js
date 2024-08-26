@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
 
        // Emit la lista de productos actualizada
        const updatedProducts = await ProductsManager.getProducts(
-         "path_to_your/products.json"
+          "./src/data/products.json"
        );
        io.emit("update-products", updatedProducts);
      } catch (error) {
@@ -73,7 +73,7 @@ io.on("connection", (socket) => {
 
         // Emitir la lista de productos actualizada a todos los clientes conectados
         const updatedProducts = await ProductsManager.getProducts(
-          "path_to_your/products.json"
+           "./src/data/products.json"
         );
         io.emit("update-products", updatedProducts);
       } catch (error) {

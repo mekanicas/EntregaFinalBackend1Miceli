@@ -62,7 +62,7 @@ document.getElementById("delete-form").addEventListener("submit", (e) => {
 });
 
 // Escuchar el evento 'update-products' para actualizar la lista de productos
-socket.on("update-products", (productos) => {
+/* socket.on("update-products", (productos) => {
   const productList = document.getElementById("product-list");
   productList.innerHTML = ""; // Limpiar la lista existente
 
@@ -72,4 +72,4 @@ socket.on("update-products", (productos) => {
       2
     )} - ID:${product.id}</li>`;
   });
-});
+}); */
