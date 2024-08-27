@@ -1,7 +1,6 @@
-import { products } from "../data/products.js";
 import { promises as fs } from "fs";
 
-export class ProductsManager {
+class ProductsManager {
   constructor(path) {
     this.path = path;
     this.products = [];
@@ -89,3 +88,5 @@ export class ProductsManager {
     }
   }
 }
+
+export default ProductsManager; 

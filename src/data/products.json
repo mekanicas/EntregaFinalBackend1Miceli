@@ -13,38 +13,14 @@
   },
   {
     "name": "Silla de ruedas",
-    "price": 1000,
-    "description": "silla",
-    "title": "silla",
-    "code": "0100",
-    "stock": 10,
-    "category": "silla",
-    "thumbnail": "silla.ong",
-    "status": true,
-    "id": 2
-  },
-  {
-    "name": "Silla de ruedas",
-    "price": 111,
+    "price": 10000,
     "description": "Silla de ruedas nueva",
     "title": "Silla de ruedas",
     "code": "AR020",
-    "stock": 10,
+    "stock": 20,
     "category": "Ortopédicos",
-    "thumbnail": "andador_ruedas.jpg",
+    "thumbnail": "silladeruedas.png",
     "status": true,
-    "id": 3
-  },
-  {
-    "name": "Barral 10cm",
-    "price": 100,
-    "description": "holaq",
-    "title": "1000",
-    "code": "10000",
-    "stock": 100,
-    "category": "caa",
-    "thumbnail": "sss.png",
-    "status": true,
-    "id": 4
+    "id": 2
   }
 ]

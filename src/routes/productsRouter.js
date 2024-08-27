@@ -1,8 +1,12 @@
 import { Router } from "express";
-import { ProductsManager } from "../dao/productsManager.js";
+import ProductsManager from "../dao/productsManager.js";
 const productManager = new ProductsManager("./src/data/products.json");
 await productManager.init();
 export const productsRouter = Router();
+import __dirname from "../utils.js"
+import { io } from "../app.js"
+
+
 
 productsRouter.get("/", async (req, res) => {
   const { limit } = req.query;
@@ -37,6 +41,7 @@ productsRouter.post("/", async (req, res) => {
   try {
     const product = req.body;
     const mensaje = await productManager.addProducto(product);
+    io.emit("realtime", products);
     if (mensaje == "Producto agregado con exito") {
       res.setHeader("Content-type", "application/json");
       res.status(200).send(mensaje);
@@ -54,6 +59,7 @@ productsRouter.put("/:pid", async (req, res) => {
   try {
     let id = req.params.pid;
     const product = req.body;
+    io.emit("realtime", products);
     const mensaje = await productManager.refreshProduct(product, id);
     if (mensaje == "El producto se actualizó correctamente") {
       res.setHeader("Content-type", "application/json");
@@ -72,6 +78,7 @@ productsRouter.delete("/:pid", async (req, res) => {
   try {
     let id = req.params.pid;
     const mensaje = await productManager.deleteProduct(id);
+    io.emit("realtime", products);
     if (mensaje == "El producto se eliminó correctamente") {
       res.setHeader("Content-type", "application/json");
       res.status(200).send(mensaje);
