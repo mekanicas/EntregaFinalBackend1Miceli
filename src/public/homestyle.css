@@ -8,8 +8,15 @@ body {
 }
 
 h1 {
+  display: flex;
   text-align: center;
   margin-top: 20px;
+}
+
+.products-container{
+  display: flex;
+  margin-top: 100px;
+  gap: 20px;
 }
 
 .product-grid {
@@ -29,6 +36,7 @@ h1 {
   overflow: hidden;
   transition: transform 0.2s ease-in-out;
   text-align: center;
+  padding: 20px;
 }
 
 .product-card:hover {

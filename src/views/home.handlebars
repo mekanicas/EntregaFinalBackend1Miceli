@@ -1,19 +1,6 @@
 <h1>Lista de Productos</h1>
 
-<div class="product-grid">
-  {{#each productos}}
-  <div class="product-card">
-    <img src="/images/{{this.thumbnail}}" alt="{{this.title}}" class="product-image" />
-    <div class="product-details">
-      <h2 class="product-title">{{this.title}}</h2>
-      <p class="product-description">{{this.description}}</p>
-      <p class="product-stock">Stock disponible: {{this.stock}}</p>
-      <p class="product-category">Categoría: {{this.category}}</p>
-      <h3 class="product-price">$ {{this.price}}</h3>
-    </div>
-  </div>
-  {{/each}}
-</div>
+<div class="products-container"></div>
 
 <script src="/socket.io/socket.io.js"></script>
-<script src="../public/home.js"></script>
+<script src="./home.js"></script>

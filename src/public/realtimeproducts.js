@@ -62,14 +62,23 @@ document.getElementById("delete-form").addEventListener("submit", (e) => {
 });
 
 // Escuchar el evento 'update-products' para actualizar la lista de productos
-/* socket.on("update-products", (productos) => {
-  const productList = document.getElementById("product-list");
-  productList.innerHTML = ""; // Limpiar la lista existente
+const updateProduct = () => {
+  const id = document.querySelector("#update-id").value;
+  const title = document.querySelector("#update-title").value;
+  const description = document.querySelector("#update-description").value;
+  const price = document.querySelector("#update-price").value;
+  const code = document.querySelector("#update-code").value;
+  const stock = document.querySelector("#update-stock").value;
+  const category = document.querySelector("#update-category").value;
 
-  // Añadir cada producto recibido del servidor a la lista
-  productos.forEach((product) => {
-    productList.innerHTML += `<li>${product.name} - $${product.price.toFixed(
-      2
-    )} - ID:${product.id}</li>`;
-  });
-}); */
+  const info = { title, description, price, code, stock, category };
+  socket.emit("modificar-producto", { info, id });
+
+  document.querySelector("#update-id").value = "";
+  document.querySelector("#update-title").value = "";
+  document.querySelector("#update-description").value = "";
+  document.querySelector("#update-price").value = "";
+  document.querySelector("#update-code").value = "";
+  document.querySelector("#update-stock").value = "";
+  document.querySelector("#update-category").value = "";
+};
