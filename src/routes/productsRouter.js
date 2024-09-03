@@ -5,13 +5,15 @@ await productManager.init();
 export const productsRouter = Router();
 import __dirname from "../utils.js"
 import { io } from "../app.js"
+import { productsModel } from "../dao/models/productsModel.js";
 
 
 
 productsRouter.get("/", async (req, res) => {
   const { limit } = req.query;
   const limite = limit !== undefined ? limit : 50;
-  let productos = await ProductsManager.getProducts(productManager.path);
+  //let productos = await ProductsManager.getProducts(productManager.path);
+  let productos = await productsModel.find().lean();
   if (productos.length > limite) {
     productos = productos.slice(0, limite);
   }
@@ -22,15 +24,9 @@ productsRouter.get("/", async (req, res) => {
 productsRouter.get("/:pid", async (req, res) => {
   try {
     let id = req.params.pid;
-    let productos = await ProductsManager.getProducts(productManager.path);
-    let idNum = parseInt(id, 10);
-
-    if (id) {
-      let filtradoPorId = productos.filter((producto) => producto.id === idNum);
-      console.log(productos);
-      res.setHeader("Content-type", "application/json");
-      return res.status(200).json({ payload: filtradoPorId });
-    }
+    //let productos = await ProductsManager.getProducts(productManager.path);
+    let productos = await productsModel.findById(id).lean()
+    return res.status(200).send(productos);
   } catch (error) {
     console.error("Error al obtener los productos:", error);
     return res.status(500).json({ error: "Error interno del servidor" });
@@ -40,7 +36,8 @@ productsRouter.get("/:pid", async (req, res) => {
 productsRouter.post("/", async (req, res) => {
   try {
     const product = req.body;
-    const mensaje = await productManager.addProducto(product);
+    const mensaje = await productsModel.create(product);
+    console.log(product)
     io.emit("realtime", products);
     if (mensaje == "Producto agregado con exito") {
       res.setHeader("Content-type", "application/json");
@@ -59,9 +56,10 @@ productsRouter.put("/:pid", async (req, res) => {
   try {
     let id = req.params.pid;
     const product = req.body;
-    io.emit("realtime", products);
-    const mensaje = await productManager.refreshProduct(product, id);
-    if (mensaje == "El producto se actualizó correctamente") {
+    console.log(product)
+    //io.emit("realtime", products);
+    const mensaje = await productsModel.findByIdAndUpdate(id, product, {new:true}).lean();
+    if (mensaje) {
       res.setHeader("Content-type", "application/json");
       res.status(200).send(mensaje);
     } else {

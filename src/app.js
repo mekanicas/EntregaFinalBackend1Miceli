@@ -9,7 +9,12 @@ import realTimeProducts from "./routes/realtimeproducts.router.js";
 import handlebars from "express-handlebars";
 import __dirname from "./utils.js";
 import ProductsManager  from "./dao/productsManager.js";
+import { connDB } from "./connDB.js";
+import { productsModel } from "./dao/models/productsModel.js";
+import mongoose from "mongoose";
 
+
+connDB()
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
@@ -54,13 +59,11 @@ io.on("connection", async (socket) => {
     console.error("Error al obtener la lista de productos:", error);
   }
 
-  // Evento para añadir un nuevo producto
   socket.on("new-product", async (product) => {
     try {
       const result = await productManager.addProducto(product);
       console.log("Resultado de añadir producto:", result);
 
-      // Enviar la lista de productos actualizada a todos los clientes
       const updatedProducts = await ProductsManager.getProducts(
         "./src/data/products.json"
       );
@@ -72,8 +75,9 @@ io.on("connection", async (socket) => {
 
   // Evento para modificar un producto
   socket.on("modificar-producto", async (producto) => {
-    await productManager.refreshProduct(producto.info, producto.id);
-    console.log(producto.id);
+    //await productsModel.findByIdAndUpdate(producto.info, producto.id);
+    const productsList = await productsModel.find();
+    //console.log(producto.id);
     socket.emit("realtime", productsList);
   });
 

@@ -34,5 +34,29 @@
     "thumbnail": "silladeruedas.png",
     "status": true,
     "id": 3
+  },
+  {
+    "name": "Tensiometro anaeroide",
+    "price": 10000,
+    "description": "Tensiometro anaeroide",
+    "title": "Tensiometro anaeroide",
+    "code": "90909",
+    "stock": 10,
+    "category": "Tensiometro",
+    "thumbnail": "tensiometros.jpg",
+    "status": true,
+    "id": 4
+  },
+  {
+    "name": "Tensiometro anaeroide",
+    "price": 10000000,
+    "description": "Tensiometro anaeroide",
+    "title": "Tensiometro anaeroide",
+    "code": "9090909",
+    "stock": 1,
+    "category": "Tensiometros",
+    "thumbnail": "tensiometros.jpg",
+    "status": true,
+    "id": 5
   }
 ]
