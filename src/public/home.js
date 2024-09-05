@@ -1,61 +1,78 @@
 const socket = io();
 
+// Seleccionar el contenedor en el DOM donde se mostrarán los productos.
 const contenedorProductos = document.querySelector(".products-container");
 
-socket.on("home", (data) => {
+// Escuchar el evento 'update-products' enviado por el servidor para mostrar los productos.
+socket.on("update-products", (data) => {
   contenedorProductos.innerHTML = "";
 
   data.forEach((product) => {
+    // Crear el contenedor de cada producto
     const productCard = document.createElement("div");
     productCard.classList.add("product-card");
 
-    // Imagen del producto
-    const img = document.createElement("img");
-    img.src = `/images/${product.thumbnail}`;
-    img.alt = product.title;
-    img.classList.add("product-image");
-
-    // Detalles del producto
+    // Crear el contenedor para la imagen y detalles del producto
     const productDetails = document.createElement("div");
     productDetails.classList.add("product-details");
 
-    // Título del producto
+    // Crear y añadir el ID del producto
+    const id = document.createElement("p");
+    id.classList.add("product-id");
+    id.innerText = `ID: ${product._id}`;
+
+    // Crear y añadir el título del producto
     const title = document.createElement("h2");
     title.classList.add("product-title");
     title.innerText = product.title;
 
-    // Descripción del producto
+    // Crear y añadir la descripción del producto
     const description = document.createElement("p");
     description.classList.add("product-description");
     description.innerText = product.description;
 
-    // Stock del producto
+    // Crear y añadir el precio del producto
+    const price = document.createElement("p");
+    price.classList.add("product-price");
+    price.innerText = `$ ${product.price}`;
+
+    // Crear y añadir el código del producto
+    const code = document.createElement("p");
+    code.classList.add("product-code");
+    code.innerText = `Código: ${product.code}`;
+
+    // Crear y añadir el stock del producto
     const stock = document.createElement("p");
     stock.classList.add("product-stock");
     stock.innerText = `Stock disponible: ${product.stock}`;
 
-    // Categoría del producto
+    // Crear y añadir la categoría del producto
     const category = document.createElement("p");
     category.classList.add("product-category");
     category.innerText = `Categoría: ${product.category}`;
 
-    // Precio del producto
-    const price = document.createElement("h3");
-    price.classList.add("product-price");
-    price.innerText = `$ ${product.price}`;
+    // Crear y añadir el botón para agregar al carrito
+    const btnAddCart = document.createElement("button");
+    btnAddCart.classList.add("btn-add-cart");
+    btnAddCart.innerText = "Agregar al carrito";
+    btnAddCart.onclick = () => {
+      socket.emit("agregar-a-carrito", product._id);
+    };
 
-    // Agregar los elementos a los detalles del producto
+    // Añadir los detalles del producto al contenedor de detalles
+    productDetails.appendChild(id);
     productDetails.appendChild(title);
     productDetails.appendChild(description);
+    productDetails.appendChild(price);
+    productDetails.appendChild(code);
     productDetails.appendChild(stock);
     productDetails.appendChild(category);
-    productDetails.appendChild(price);
+    productDetails.appendChild(btnAddCart);
 
-    // Agregar la imagen y los detalles al contenedor de la tarjeta del producto
-    productCard.appendChild(img);
+    // Añadir el contenedor de detalles al contenedor del producto
     productCard.appendChild(productDetails);
 
-    // Agregar la tarjeta del producto al contenedor principal
+    // Añadir la tarjeta del producto al contenedor principal
     contenedorProductos.appendChild(productCard);
   });
 });

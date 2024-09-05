@@ -4,6 +4,7 @@ import { Server } from "socket.io";
 import path from "path";
 import { productsRouter } from "./routes/productsRouter.js";
 import { cartRouter } from "./routes/cartRouter.js";
+import { CartModel } from "./dao/models/cart.model.js";
 import homeRoute from "./routes/home.router.js";
 import realTimeProducts from "./routes/realtimeproducts.router.js";
 import handlebars from "express-handlebars";
@@ -43,30 +44,34 @@ app.get("/", (req, res) => {
   };
   res.render("index", testUser);
 });
-//Configuracion websockets
-let products = []; // Array para los products
+// Configuración de WebSockets
 io.on("connection", async (socket) => {
   console.log(`Usuario conectado. ID: ${socket.id}`);
 
-  // Enviar la lista de productos actual a la conexión nueva
   try {
-    const productsList = await ProductsManager.getProducts(
-      "./src/data/products.json"
-    );
+    // Enviar productos actuales al conectar
+    const productsList = await productsModel.find().lean();
     socket.emit("home", productsList);
     socket.emit("realtime", productsList);
+
+    const cid = "66b4b785c2436e2a44eb0554"; // Ejemplo de ID de carrito
+    const newCart = await CartModel.findById(cid).populate("products.product");
+    socket.emit("cart", newCart);
   } catch (error) {
     console.error("Error al obtener la lista de productos:", error);
   }
 
+  // Evento para añadir un nuevo producto
   socket.on("new-product", async (product) => {
     try {
-      const result = await productManager.addProducto(product);
+      // Agregar el nuevo producto a la base de datos usando ProductModel
+      const result = await productsModel.create(product);
       console.log("Resultado de añadir producto:", result);
 
-      const updatedProducts = await ProductsManager.getProducts(
-        "./src/data/products.json"
-      );
+      // Obtener la lista actualizada de productos desde la base de datos
+      const updatedProducts = await productsModel.find().lean();
+
+      // Emitir la lista actualizada a todos los clientes conectados
       io.emit("update-products", updatedProducts);
     } catch (error) {
       console.error("Error al añadir producto:", error);
@@ -74,11 +79,19 @@ io.on("connection", async (socket) => {
   });
 
   // Evento para modificar un producto
-  socket.on("modificar-producto", async (producto) => {
-    //await productsModel.findByIdAndUpdate(producto.info, producto.id);
-    const productsList = await productsModel.find();
-    //console.log(producto.id);
-    socket.emit("realtime", productsList);
+  socket.on("modificar-producto", async ({ id, info }) => {
+    try {
+      // Actualizar el producto en la base de datos usando el ID y la información proporcionada
+      await productsModel.findByIdAndUpdate(id, info, { new: true });
+
+      // Obtener la lista actualizada de productos
+      const productsList = await productsModel.find().lean();
+
+      // Emitir la lista actualizada a todos los clientes conectados
+      io.emit("update-products", productsList);
+    } catch (error) {
+      console.error("Error al modificar el producto:", error);
+    }
   });
 
   // Evento para eliminar un producto
@@ -86,27 +99,50 @@ io.on("connection", async (socket) => {
     console.log("ID recibido para eliminar:", productId);
 
     try {
-      await productManager.deleteProduct(productId);
-      console.log("Resultado de eliminación:", result);
+      // Eliminar el producto usando ProductModel
+      await productsModel.findByIdAndDelete(productId);
+      console.log("Producto eliminado");
 
-      // Enviar la lista de productos actualizada a todos los clientes
-      const updatedProducts = await ProductsManager.getProducts(
-        "./src/data/products.json"
-      );
+      // Obtener la lista actualizada de productos desde la base de datos
+      const updatedProducts = await productsModel.find().lean();
+
+      // Emitir la lista actualizada a todos los clientes conectados
       io.emit("update-products", updatedProducts);
     } catch (error) {
       console.error("Error al eliminar producto:", error);
     }
   });
 
+  socket.on("agregar-a-carrito", async (pid) => {
+    const cid = "66b4b785c2436e2a44eb0554"; //carrito estatico de ejemplo
+    const cartSelect = await CartModel.findById(cid);
+    const indexProd = cartSelect.products.findIndex(
+      (prod) => prod.product.toString() === pid
+    );
+    if (indexProd === -1) {
+      cartSelect.products.push({ product: pid, quantity: 1 });
+    } else {
+      cartSelect.products[indexProd] = {
+        product: cartSelect.products[indexProd].product,
+        quantity: cartSelect.products[indexProd].quantity + 1,
+      };
+    }
+    const newCart = await CartModel.findByIdAndUpdate(cid, cartSelect, {
+      new: true,
+    }).populate("products.product");
+
+    socketServer.emit("cart", newCart);
+  });
+
   socket.on("disconnect", () => {
     console.log("Usuario desconectado");
   });
 });
+
 // Iniciar el servidor
 server.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
 
-//exportar server
+// Exportar server
 export { io };
