@@ -4,7 +4,7 @@ const socket = io();
 const contenedorProductos = document.querySelector(".products-container");
 
 // Escuchar el evento 'update-products' enviado por el servidor para mostrar los productos.
-socket.on("home", (data) => {
+socket.on("update-products", (data) => {
   contenedorProductos.innerHTML = "";
 
   data.forEach((product) => {

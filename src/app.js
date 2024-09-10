@@ -6,7 +6,6 @@ import { productsRouter } from "./routes/productsRouter.js";
 import { cartRouter } from "./routes/cartRouter.js";
 import { CartModel } from "./dao/models/cart.model.js";
 import homeRoute from "./routes/home.router.js";
-import cartView from "./routes/cartview.js"
 import realTimeProducts from "./routes/realtimeproducts.router.js";
 import handlebars from "express-handlebars";
 import __dirname from "./utils.js";
@@ -35,7 +34,6 @@ app.use(express.urlencoded({ extended: true }));
 // Rutas
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
-app.use("/cart", cartView)
 app.use("/home", homeRoute);
 app.use("/realtimeproducts", realTimeProducts);
 // Rutas de vistas
@@ -56,7 +54,7 @@ io.on("connection", async (socket) => {
     socket.emit("home", productsList);
     socket.emit("realtime", productsList);
 
-    const cid = "66da81458c031bf6201de190"; // Ejemplo de ID de carrito
+    const cid = "66b4b785c2436e2a44eb0554"; // Ejemplo de ID de carrito
     const newCart = await CartModel.findById(cid).populate("products.product");
     socket.emit("cart", newCart);
   } catch (error) {
@@ -97,12 +95,12 @@ io.on("connection", async (socket) => {
   });
 
   // Evento para eliminar un producto
-  socket.on("delete-product", async (id) => {
-    console.log("ID recibido para eliminar:", id);
+  socket.on("delete-product", async (productId) => {
+    console.log("ID recibido para eliminar:", productId);
 
     try {
       // Eliminar el producto usando ProductModel
-      await productsModel.findByIdAndDelete(id);
+      await productsModel.findByIdAndDelete(productId);
       console.log("Producto eliminado");
 
       // Obtener la lista actualizada de productos desde la base de datos
@@ -116,9 +114,8 @@ io.on("connection", async (socket) => {
   });
 
   socket.on("agregar-a-carrito", async (pid) => {
-    const cid = "66da81458c031bf6201de190"; //carrito estatico de ejemplo
+    const cid = "66b4b785c2436e2a44eb0554"; //carrito estatico de ejemplo
     const cartSelect = await CartModel.findById(cid);
-    console.log(cartSelect)
     const indexProd = cartSelect.products.findIndex(
       (prod) => prod.product.toString() === pid
     );

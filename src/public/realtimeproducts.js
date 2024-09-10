@@ -106,19 +106,19 @@ document.getElementById("product-form").addEventListener("submit", (e) => {
 document.getElementById("delete-form").addEventListener("submit", (e) => {
   e.preventDefault();
 
-  const id = (
+  const productId = parseInt(
     document.getElementById("productIdToDelete").value
   );
 
-  if (id <= 0) {
+  if (isNaN(productId) || productId <= 0) {
     alert("Por favor ingrese un ID válido.");
     return;
   }
 
-  console.log("Emitiendo ID del producto a eliminar:", id);
+  console.log("Emitiendo ID del producto a eliminar:", productId);
 
   // Emitir el ID del producto a eliminar al servidor
-  socket.emit("delete-product", id);
+  socket.emit("delete-product", productId);
 
   // Limpiar el formulario después del envío
   document.getElementById("productIdToDelete").value = "";

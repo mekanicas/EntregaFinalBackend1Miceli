@@ -41,8 +41,8 @@ cartRouter.get("/:cid", async (req, res) => {
 // Crear un nuevo carrito vacío
 cartRouter.post("/", async (req, res) => {
   try {
-    const cart = await CartModel.create({products:[]})
-    res.status(201).json({ mensaje: "Carrito creado", cart });
+    const cart = await cartManager.createCart();
+    res.status(201).json({ mensaje: "Carrito creado", payload: cart });
   } catch (error) {
     console.error("Error al crear el carrito:", error);
     res.status(500).json({ error: "Error interno del servidor" });
@@ -50,38 +50,20 @@ cartRouter.post("/", async (req, res) => {
 });
 
 // Agregar un Producto a un Carrito
-
-cartRouter.put("/:cid/product/:pid", async(req, res) => {
-  const {cid, pid} = req.params;
-  const cartSelect = await CartModel.findById(cid)
-  const indexProd = cartSelect.products.findIndex(prod => prod.product.toString() === pid);
-  if(indexProd === -1){
-    cartSelect.products.push({product: pid, quantity: 1})
-  }else{
-    cartSelect.products[indexProd] = {product: cartSelect.products[indexProd].product, quantity: cartSelect.products[indexProd].quantity + 1}
-  }
-  const cartUpdated = await CartModel.findByIdAndUpdate(cid, cartSelect, {new : true}).populate('products.product')
-  res.status(200).json({"mensaje": "Producto agregado al carrito", "payload": {cartUpdated}})
-})
-
-cartRouter.put("/:cid", async(req, res) => {
-  const { cid } = req.params;
-  const { products } = req.body; // Suponemos que products es un arreglo con productos y cantidades
-  
+cartRouter.post("/:cid/product/:pid", async (req, res) => {
   try {
-    let cartSelect = await CartModel.findById(cid);
-    if (!cartSelect) {
-      return res.status(404).json({ mensaje: "Carrito no encontrado" });
-    }
-    cartSelect.products = products;
-    // Iteramos sobre los productos recibidos en el body
-
-    // Guardamos los cambios
-    const cartUpdated = await CartModel.findByIdAndUpdate(cid, cartSelect, { new: true }).populate('products.product');
-
-    res.status(200).json({ mensaje: "Carrito actualizado", payload: { cartUpdated } });
+    const cartId = parseInt(req.params.cid);
+    const productId = parseInt(req.params.pid);
+    const { quantity } = req.body;
+    const mensaje = await cartManager.addProductToCart(
+      cartId,
+      productId,
+      quantity
+    );
+    res.status(200).json({ mensaje });
   } catch (error) {
-    res.status(500).json({ mensaje: "Error al actualizar el carrito", error });
+    console.error("Error al agregar producto al carrito:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
