@@ -10,29 +10,54 @@ await productManager.init();
 
 
 productsRouter.get("/", async (req, res) => {
+  let { limit, page, sort, query, category, status } = req.query;
+  const limitN = parseInt(limit);
+  const pageN = parseInt(page);
+  
+  const sortManager = {
+    asc: 1,
+    desc: -1,
+  };
+  
+  if (!page || isNaN(Number(page))) {
+    page = 1;
+  }
+  if (!limit || isNaN(Number(limit))) {
+    limit = 20;
+  }
+  
+  // Crear el filtro de búsqueda basado en query, categoría y status
+  let filter = {};
+  
+  // Filtrar por categoría si se proporciona
+  if (category) {
+    filter.category = category;
+  }
+  
+  // Filtrar por disponibilidad (status) si se proporciona
+  if (status) {
+    filter.status = status === "true"; // Convertir el string a boolean
+  }
+  
+  // Combinar query con los filtros de categoría y status
+  if (query) {
+    filter = { ...filter, ...query };
+  }
+  
   try {
-    const { limit = 10, page = 1, sort = "", ...query } = req.query;
-    const limitN = parseInt(limit);
-    const pageN = parseInt(page);
-
-    const sortManager = {
-      asc: 1,
-      desc: -1,
-    };
-
     const productos = await productsModel.paginate(
-      { ...query },
+      filter,
       {
         limit: limitN,
         page: pageN,
         ...(sort && { sort: { price: sortManager[sort] } }),
-        customLabels: { docs: "Productos" },
+        customLabels: { docs: "productos" },
       }
     );
 
     res
       .status(200)
-      .json({ mensaje: "Productos Encontrados", payload: productos });
+      .json({ status: "success", payload: productos });
   } catch (error) {
     console.error("Error al obtener los productos:", error);
     res.status(500).json({ error: "Error interno del servidor" });

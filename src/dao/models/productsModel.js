@@ -1,17 +1,21 @@
 import mongoose, {Schema, model} from "mongoose";
 import mongoosePaginate from 'mongoose-paginate-v2'
 
-const productosColl = "Productos"
+const productosColl = "productos"
 const productosSchema = new mongoose.Schema(
     {
         price : Number,
         description : String,
         title : String,
-        code : Number,
+        code : {
+            type: String, unique : true
+        },
         stock : Number,
         category : String,
         thumbnail : String,
-        status : Boolean,
+        status : {
+            type : Boolean, default : true
+        }
     },
 )
 
