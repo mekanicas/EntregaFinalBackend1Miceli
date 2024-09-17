@@ -5,9 +5,7 @@ import path from "path";
 import { productsRouter } from "./routes/productsRouter.js";
 import { cartRouter } from "./routes/cartRouter.js";
 import { CartModel } from "./dao/models/cart.model.js";
-import homeRoute from "./routes/home.router.js";
-import cartView from "./routes/cartview.js"
-import realTimeProducts from "./routes/realtimeproducts.router.js";
+import vistasRouter from "./routes/vistasRouter.js";
 import handlebars from "express-handlebars";
 import __dirname from "./utils.js";
 import ProductsManager  from "./dao/productsManager.js";
@@ -34,10 +32,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // Rutas
 app.use("/api/products", productsRouter);
-app.use("/api/cart", cartRouter);
-app.use("/cart", cartView)
-app.use("/home", homeRoute);
-app.use("/realtimeproducts", realTimeProducts);
+app.use("/api/carts", cartRouter);
+app.use("/", vistasRouter);
 // Rutas de vistas
 app.get("/", (req, res) => {
   let testUser = {
